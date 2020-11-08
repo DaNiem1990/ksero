@@ -1,0 +1,40 @@
+version: "3"
+services:
+  db:
+    image: mysql:5.7.24
+    restart: always
+    container_name: ksero-mydb
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: mydb1
+      MYSQL_DATABASE: mydb
+    ports:
+      - "3306:3306"
+
+  app:
+    build: src/
+    restart: always
+    container_name: ksero-myweb
+    depends_on:
+      - db
+    ports:
+      - "8888:80"
+    volumes:
+      - ./src/ksero:/var/www/ksero
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - db:db
+    ports:
+      - "8000:80"
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: mydb1
+      MYSQL_ROOT_PASSWORD: mydb1
+      PMA_HOST: db
+      PMA_PORT: 3306
+
+volumes:
+  web-app:
+    driver: local
